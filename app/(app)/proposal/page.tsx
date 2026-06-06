@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import MenuCard from "@/components/proposal/MenuCard";
-import MessageCard from "@/components/proposal/MessageCard";
 import { primaryButtonClass } from "@/lib/styles";
 
 type Menu = {
@@ -51,7 +50,14 @@ export default function ProposalPage() {
         return;
       }
 
-      setState({ status: "done", data: json as SuggestResult });
+      const result = json as SuggestResult;
+      setState({ status: "done", data: result });
+
+      // 返答文章を record ページで参照できるよう sessionStorage に保存
+      sessionStorage.setItem(
+        `messages-${result.sessionId}`,
+        JSON.stringify(result.messages)
+      );
     } catch {
       setState({
         status: "error",
@@ -88,7 +94,7 @@ export default function ProposalPage() {
     );
   }
 
-  const { sessionId, menus, messages } = state.data;
+  const { sessionId, menus } = state.data;
 
   const recordHref = selectedMenu
     ? `/record?sessionId=${sessionId}&menuId=${selectedMenu.id ?? ""}&menuName=${encodeURIComponent(selectedMenu.name)}&menuCategory=${encodeURIComponent(selectedMenu.category)}`
@@ -97,10 +103,18 @@ export default function ProposalPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-          メニュー候補
-        </h2>
-        <div className="space-y-2">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+            メニュー候補
+          </h2>
+          <button
+            onClick={fetchSuggestion}
+            className="text-xs text-orange-500 hover:text-orange-700 transition-colors flex items-center gap-1"
+          >
+            <span>↺</span> 入れ替え
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
           {menus.map((menu) => (
             <MenuCard
               key={menu.id ?? menu.name}
@@ -110,17 +124,6 @@ export default function ProposalPage() {
                 setSelectedMenu({ id: menu.id, name: menu.name, category: menu.category })
               }
             />
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-          返答文章
-        </h2>
-        <div className="space-y-2">
-          {messages.map((msg, i) => (
-            <MessageCard key={i} message={msg} />
           ))}
         </div>
       </div>

@@ -1,10 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { inputClass, primaryButtonClass } from "@/lib/styles";
 import { COOKED_BY_LABELS } from "@/lib/types/home";
 import type { CookedBy, MenuCategory } from "@/lib/supabase/types";
+import MessageCard from "@/components/proposal/MessageCard";
+
+type Message = {
+  tone: "polite" | "casual" | "emoji";
+  text: string;
+};
 
 const CATEGORY_OPTIONS: MenuCategory[] = ["和食", "洋食", "中華", "麺", "丼", "その他"];
 const COOKED_BY_OPTIONS = Object.entries(COOKED_BY_LABELS) as [CookedBy, string][];
@@ -21,6 +27,17 @@ export default function RecordPage() {
   const menuId = params.get("menuId") ?? undefined;
   const proposedMenuName = params.get("menuName") ?? "";
   const proposedMenuCategory = (params.get("menuCategory") ?? "その他") as MenuCategory;
+
+  // sessionStorage から返答文章を取得（proposal ページで保存済み）
+  const messages = useMemo<Message[]>(() => {
+    if (!sessionId) return [];
+    try {
+      const stored = sessionStorage.getItem(`messages-${sessionId}`);
+      return stored ? (JSON.parse(stored) as Message[]) : [];
+    } catch {
+      return [];
+    }
+  }, [sessionId]);
 
   const [actualMenuName, setActualMenuName] = useState("");
   const [actualMenuCategory, setActualMenuCategory] = useState<MenuCategory>("その他");
@@ -92,6 +109,18 @@ export default function RecordPage() {
               {proposedMenuCategory}
             </span>
           </div>
+        </div>
+      )}
+
+      {/* 返答文章 */}
+      {messages.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+            返答文章
+          </h2>
+          {messages.map((msg, i) => (
+            <MessageCard key={i} message={msg} />
+          ))}
         </div>
       )}
 

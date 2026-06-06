@@ -22,8 +22,7 @@ const SuggestOutputSchema = z.object({
         reason: z.string(),
       })
     )
-    .min(3)
-    .max(5),
+    .length(4),
   messages: z
     .array(
       z.object({
@@ -41,7 +40,7 @@ const SYSTEM_PROMPT = `あなたは晩ごはんの提案アシスタントです
 気の利いた返答と具体的なメニュー候補を提案します。
 
 以下のルールを守ってください：
-- メニュー候補は3〜5件、バリエーションをつけて提案する
+- メニュー候補はちょうど4件、バリエーションをつけて提案する
 - 除外リストのメニューは絶対に提案しない
 - パートナーの好み・嫌いなものを最優先で考慮する
 - 返答文章は3パターン必ず生成する（polite・casual・emoji の各1件ずつ）

@@ -25,31 +25,34 @@ export async function POST(req: NextRequest) {
   const body: RecordBody = await req.json();
   const { sessionId, menuId, menuName, menuCategory, cookedBy, memo, eatenAt } = body;
 
-  // menuId があればそのまま使用、なければ名前で upsert してIDを取得
+  // menuId があればそのまま使用、なければ名前で SELECT → INSERT してIDを取得
+  // UPDATE の RLS を避けるため upsert ではなく SELECT → INSERT の順で処理
   let resolvedMenuId = menuId && menuId !== "" ? menuId : null;
 
   if (!resolvedMenuId) {
-    const { data: upserted } = await supabase
+    const { data: existing } = await supabase
       .from("menus")
-      .upsert(
-        {
-          name: menuName,
-          category: menuCategory as never,
-          is_shared: false,
-          created_by: user.id,
-        },
-        { onConflict: "name", ignoreDuplicates: false }
-      )
       .select("id")
-      .single();
+      .eq("name", menuName)
+      .maybeSingle();
 
-    if (!upserted) {
-      return NextResponse.json(
-        { error: "メニューの保存に失敗しました" },
-        { status: 500 }
-      );
+    if (existing) {
+      resolvedMenuId = existing.id;
+    } else {
+      const { data: inserted } = await supabase
+        .from("menus")
+        .insert({ name: menuName, category: menuCategory as never, is_shared: false, created_by: user.id })
+        .select("id")
+        .single();
+
+      if (!inserted) {
+        return NextResponse.json(
+          { error: "メニューの保存に失敗しました" },
+          { status: 500 }
+        );
+      }
+      resolvedMenuId = inserted.id;
     }
-    resolvedMenuId = upserted.id;
   }
 
   // 実食記録を保存

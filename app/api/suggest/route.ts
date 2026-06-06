@@ -70,25 +70,25 @@ export async function POST() {
     );
   }
 
-  // メニューを upsert（名前が同じなら既存を再利用、なければ新規作成）
+  // メニューを SELECT-first で取得（既存なら再利用、なければ新規作成）
+  // UPDATE の RLS を避けるため upsert ではなく SELECT → INSERT の順で処理
   const upsertedMenus: { id: string; name: string; category: string }[] = [];
   for (const menu of suggestion.menus) {
-    const { data: upserted } = await supabase
+    const { data: existing } = await supabase
       .from("menus")
-      .upsert(
-        {
-          name: menu.name,
-          category: menu.category as never,
-          is_shared: true,
-          created_by: null,
-        },
-        { onConflict: "name", ignoreDuplicates: false }
-      )
       .select("id, name, category")
-      .single();
+      .eq("name", menu.name)
+      .maybeSingle();
 
-    if (upserted) {
-      upsertedMenus.push(upserted);
+    if (existing) {
+      upsertedMenus.push(existing);
+    } else {
+      const { data: inserted } = await supabase
+        .from("menus")
+        .insert({ name: menu.name, category: menu.category as never, is_shared: true, created_by: null })
+        .select("id, name, category")
+        .single();
+      if (inserted) upsertedMenus.push(inserted);
     }
   }
 

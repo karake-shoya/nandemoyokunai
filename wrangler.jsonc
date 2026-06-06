@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "nandemoyokunai",
+  "compatibility_date": "2025-06-06",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      // セルフリファレンス: サービス名はワーカー名と一致させること
+      // https://opennext.js.org/cloudflare/caching
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "nandemoyokunai"
+    }
+  ],
+  "r2_buckets": [
+    {
+      // R2 インクリメンタルキャッシュ
+      // デプロイ前に作成: wrangler r2 bucket create nandemoyokunai-opennext-cache
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "nandemoyokunai-opennext-cache"
+    }
+  ],
+  "images": {
+    // 画像最適化
+    "binding": "IMAGES"
+  }
+}

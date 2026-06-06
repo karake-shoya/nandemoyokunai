@@ -23,7 +23,13 @@ export default async function HomePage() {
 
   const { data: mealLogs } = await supabase
     .from("meal_logs")
-    .select("id, eaten_at, cooked_by, memo, menus(name, category)")
+    .select(`
+      id, eaten_at, cooked_by, memo,
+      menus!meal_logs_menu_id_fkey(name, category),
+      suggestion_sessions!meal_logs_session_id_fkey(
+        menus!suggestion_sessions_selected_menu_id_fkey(name)
+      )
+    `)
     .eq("user_id", user.id)
     .order("eaten_at", { ascending: false })
     .limit(5);

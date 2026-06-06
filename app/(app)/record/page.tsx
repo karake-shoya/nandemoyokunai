@@ -25,7 +25,7 @@ export default function RecordPage() {
   const params = useSearchParams();
 
   const sessionId = params.get("sessionId") ?? undefined;
-  const menuId = params.get("menuId") ?? undefined;
+  const proposedMenuId = params.get("menuId") ?? undefined;
   const proposedMenuName = params.get("menuName") ?? "";
   const proposedMenuCategory = (params.get("menuCategory") ?? "その他") as MenuCategory;
 
@@ -73,7 +73,8 @@ export default function RecordPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId,
-          menuId: isUsingProposed ? menuId : undefined,
+          proposedMenuId,
+          actualMenuId: isUsingProposed ? proposedMenuId : undefined,
           menuName: actualMenuName.trim(),
           menuCategory: actualMenuCategory,
           cookedBy,

@@ -239,6 +239,13 @@ export interface Database {
             isOneToOne: false;
             referencedRelation: "menus";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "meal_logs_session_id_fkey";
+            columns: ["session_id"];
+            isOneToOne: false;
+            referencedRelation: "suggestion_sessions";
+            referencedColumns: ["id"];
           }
         ];
       };

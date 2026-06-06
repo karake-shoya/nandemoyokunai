@@ -6,6 +6,9 @@ export type MealLogWithMenu = {
   cooked_by: CookedBy;
   memo: string | null;
   menus: { name: string; category: MenuCategory } | null;
+  suggestion_sessions: {
+    menus: { name: string } | null;
+  } | null;
 };
 
 export const COOKED_BY_LABELS: Record<CookedBy, string> = {

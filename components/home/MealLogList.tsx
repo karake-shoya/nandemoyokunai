@@ -20,21 +20,32 @@ export default function MealLogList({ logs }: { logs: MealLogWithMenu[] }) {
         </div>
       ) : (
         <ul className="space-y-2">
-          {logs.map((log) => (
-            <li key={log.id} className="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-800">
-                  {log.menus?.name ?? "不明なメニュー"}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {COOKED_BY_LABELS[log.cooked_by]}
-                </p>
-              </div>
-              <span className="text-xs text-gray-400 shrink-0 ml-4">
-                {formatDate(log.eaten_at)}
-              </span>
-            </li>
-          ))}
+          {logs.map((log) => {
+            const actualName = log.menus?.name ?? "不明なメニュー";
+            const proposedName = log.suggestion_sessions?.menus?.name ?? null;
+            const showProposed = proposedName && proposedName !== actualName;
+
+            return (
+              <li key={log.id} className="bg-white rounded-xl border border-gray-100 px-4 py-3 flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  {showProposed && (
+                    <p className="text-xs text-gray-400 mb-0.5">
+                      提案: {proposedName}
+                    </p>
+                  )}
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {showProposed ? `実際: ${actualName}` : actualName}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {COOKED_BY_LABELS[log.cooked_by]}
+                  </p>
+                </div>
+                <span className="text-xs text-gray-400 shrink-0">
+                  {formatDate(log.eaten_at)}
+                </span>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

@@ -3,7 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 
 type RecordBody = {
   sessionId?: string;
-  menuId?: string;
+  proposedMenuId?: string;
+  actualMenuId?: string;
   menuName: string;
   menuCategory: string;
   cookedBy: string;
@@ -23,11 +24,10 @@ export async function POST(req: NextRequest) {
   }
 
   const body: RecordBody = await req.json();
-  const { sessionId, menuId, menuName, menuCategory, cookedBy, memo, eatenAt } = body;
+  const { sessionId, proposedMenuId, actualMenuId, menuName, menuCategory, cookedBy, memo, eatenAt } = body;
 
-  // menuId があればそのまま使用、なければ名前で SELECT → INSERT してIDを取得
-  // UPDATE の RLS を避けるため upsert ではなく SELECT → INSERT の順で処理
-  let resolvedMenuId = menuId && menuId !== "" ? menuId : null;
+  // 実際に食べたメニューの ID を解決（actualMenuId があればそのまま使用）
+  let resolvedMenuId = actualMenuId && actualMenuId !== "" ? actualMenuId : null;
 
   if (!resolvedMenuId) {
     const { data: existing } = await supabase
@@ -73,11 +73,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // セッションの selected_menu_id を更新
-  if (sessionId) {
+  // selected_menu_id = 提案画面で選んだメニュー（実際に食べたものではない）
+  if (sessionId && proposedMenuId && proposedMenuId !== "") {
     await supabase
       .from("suggestion_sessions")
-      .update({ selected_menu_id: resolvedMenuId })
+      .update({ selected_menu_id: proposedMenuId })
       .eq("id", sessionId)
       .eq("user_id", user.id);
   }

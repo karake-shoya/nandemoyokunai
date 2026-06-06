@@ -102,6 +102,10 @@ export default function ProposalPage() {
 
   return (
     <div className="space-y-6">
+      <Link href="/home" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+        ← ホームに戻る
+      </Link>
+
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">

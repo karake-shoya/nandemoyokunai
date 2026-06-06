@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { inputClass, primaryButtonClass } from "@/lib/styles";
 import { COOKED_BY_LABELS } from "@/lib/types/home";
 import type { CookedBy, MenuCategory } from "@/lib/supabase/types";
@@ -97,6 +98,10 @@ export default function RecordPage() {
 
   return (
     <div className="space-y-4">
+      <Link href="/proposal" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+        ← 提案に戻る
+      </Link>
+
       {/* 提案したメニュー（表示のみ） */}
       {proposedMenuName && (
         <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-2">

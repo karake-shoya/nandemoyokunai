@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import MenuCard from "@/components/proposal/MenuCard";
 import MessageCard from "@/components/proposal/MessageCard";
 import { primaryButtonClass } from "@/lib/styles";
@@ -23,6 +24,8 @@ type SuggestResult = {
   messages: Message[];
 };
 
+type SelectedMenu = { id?: string; name: string; category: string };
+
 type State =
   | { status: "loading" }
   | { status: "error"; message: string }
@@ -30,11 +33,11 @@ type State =
 
 export default function ProposalPage() {
   const [state, setState] = useState<State>({ status: "loading" });
-  const [selectedMenuId, setSelectedMenuId] = useState<string | null>(null);
+  const [selectedMenu, setSelectedMenu] = useState<SelectedMenu | null>(null);
 
   async function fetchSuggestion() {
     setState({ status: "loading" });
-    setSelectedMenuId(null);
+    setSelectedMenu(null);
 
     try {
       const res = await fetch("/api/suggest", { method: "POST" });
@@ -85,7 +88,11 @@ export default function ProposalPage() {
     );
   }
 
-  const { menus, messages } = state.data;
+  const { sessionId, menus, messages } = state.data;
+
+  const recordHref = selectedMenu
+    ? `/record?sessionId=${sessionId}&menuId=${selectedMenu.id ?? ""}&menuName=${encodeURIComponent(selectedMenu.name)}&menuCategory=${encodeURIComponent(selectedMenu.category)}`
+    : null;
 
   return (
     <div className="space-y-6">
@@ -98,8 +105,10 @@ export default function ProposalPage() {
             <MenuCard
               key={menu.id ?? menu.name}
               menu={menu}
-              isSelected={selectedMenuId === (menu.id ?? menu.name)}
-              onSelect={() => setSelectedMenuId(menu.id ?? menu.name)}
+              isSelected={selectedMenu?.name === menu.name}
+              onSelect={() =>
+                setSelectedMenu({ id: menu.id, name: menu.name, category: menu.category })
+              }
             />
           ))}
         </div>
@@ -116,12 +125,15 @@ export default function ProposalPage() {
         </div>
       </div>
 
-      <button
-        disabled
-        className={`${primaryButtonClass} mt-2`}
-      >
-        記録する（近日公開）
-      </button>
+      {recordHref ? (
+        <Link href={recordHref} className={`${primaryButtonClass} block text-center mt-2`}>
+          記録する
+        </Link>
+      ) : (
+        <button disabled className={`${primaryButtonClass} mt-2`}>
+          メニューを選んで記録する
+        </button>
+      )}
     </div>
   );
 }

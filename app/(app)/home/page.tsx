@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import CtaCard from "@/components/home/CtaCard";
+import MealLogList from "@/components/home/MealLogList";
+import type { MealLogWithMenu } from "@/lib/types/home";
 
-// TODO: Phase 1 でホーム画面を実装する
 export default async function HomePage() {
   const supabase = await createClient();
 
@@ -9,27 +11,27 @@ export default async function HomePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    redirect("/login");
-  }
+  if (!user) redirect("/login");
 
-  // オンボーディング未完了なら /onboarding へ
   const { data: partner } = await supabase
     .from("partners")
     .select("id")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (!partner) {
-    redirect("/onboarding");
-  }
+  if (!partner) redirect("/onboarding");
+
+  const { data: mealLogs } = await supabase
+    .from("meal_logs")
+    .select("id, eaten_at, cooked_by, memo, menus(name, category)")
+    .eq("user_id", user.id)
+    .order("eaten_at", { ascending: false })
+    .limit(5);
 
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-orange-700">なんでもよくない</h1>
-        <p className="mt-2 text-gray-500">ホーム画面は実装中です</p>
-      </div>
+    <div className="space-y-6">
+      <CtaCard />
+      <MealLogList logs={(mealLogs ?? []) as MealLogWithMenu[]} />
     </div>
   );
 }

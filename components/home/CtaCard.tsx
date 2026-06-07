@@ -14,6 +14,12 @@ export default function CtaCard() {
       <Link href="/proposal" className={primaryButtonClass + " block text-center"}>
         提案してもらう
       </Link>
+      <Link
+        href="/record"
+        className="mt-2 block w-full rounded-lg border border-gray-200 px-4 py-2.5 text-center text-sm font-medium text-gray-500 hover:border-orange-300 hover:text-orange-600 transition-colors"
+      >
+        食事を記録する
+      </Link>
     </div>
   );
 }

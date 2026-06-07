@@ -6,9 +6,7 @@ import type { MealLogForHistory } from "@/lib/types/home";
 import { COOKED_BY_LABELS } from "@/lib/types/home";
 import { inputClass } from "@/lib/styles";
 import type { CookedBy, MenuCategory } from "@/lib/supabase/types";
-
-const CATEGORY_OPTIONS: MenuCategory[] = ["和食", "洋食", "中華", "麺", "丼", "その他"];
-const COOKED_BY_OPTIONS = Object.entries(COOKED_BY_LABELS) as [CookedBy, string][];
+import { CATEGORY_OPTIONS, COOKED_BY_OPTIONS } from "@/lib/constants";
 
 function formatDisplayDate(dateStr: string): string {
   const d = new Date(dateStr);
@@ -25,7 +23,25 @@ type EditState = {
   error: string | null;
 };
 
-function LogItem({ log }: { log: MealLogForHistory }) {
+function logToForm(log: MealLogForHistory): EditState {
+  return {
+    menuName: log.menus?.name ?? "",
+    menuCategory: (log.menus?.category ?? "その他") as MenuCategory,
+    cookedBy: log.cooked_by,
+    memo: log.memo ?? "",
+    eatenAt: log.eaten_at,
+    saving: false,
+    error: null,
+  };
+}
+
+function LogItem({
+  log,
+  onDateChange,
+}: {
+  log: MealLogForHistory;
+  onDateChange: (date: string) => void;
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<EditState>({
@@ -62,6 +78,9 @@ function LogItem({ log }: { log: MealLogForHistory }) {
 
     setForm((f) => ({ ...f, saving: false }));
     setEditing(false);
+    if (form.eatenAt !== log.eaten_at) {
+      onDateChange(form.eatenAt);
+    }
     router.refresh();
   }
 
@@ -69,23 +88,23 @@ function LogItem({ log }: { log: MealLogForHistory }) {
     return (
       <li className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-800 truncate">
+          <p className="text-sm font-medium text-parchment truncate">
             {log.menus?.name ?? "不明なメニュー"}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="text-xs text-cinder mt-0.5">
             {COOKED_BY_LABELS[log.cooked_by]}
             {log.memo && <span className="ml-2">— {log.memo}</span>}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {log.menus?.category && (
-            <span className="rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-600">
+            <span className="rounded-full bg-gold/10 px-2 py-0.5 text-xs text-gold">
               {log.menus.category}
             </span>
           )}
           <button
             onClick={() => setEditing(true)}
-            className="text-xs text-gray-400 hover:text-orange-500 transition-colors"
+            className="text-xs text-cinder hover:text-ember transition-colors"
           >
             編集
           </button>
@@ -95,7 +114,7 @@ function LogItem({ log }: { log: MealLogForHistory }) {
   }
 
   return (
-    <li className="space-y-3 rounded-xl bg-orange-50 border border-orange-100 p-3">
+    <li className="space-y-3 rounded-xl bg-coal border border-edge/50 p-3">
       <div className="space-y-2">
         <input
           type="text"
@@ -106,11 +125,15 @@ function LogItem({ log }: { log: MealLogForHistory }) {
         />
         <select
           value={form.menuCategory}
-          onChange={(e) => setForm((f) => ({ ...f, menuCategory: e.target.value as MenuCategory }))}
+          onChange={(e) =>
+            setForm((f) => ({ ...f, menuCategory: e.target.value as MenuCategory }))
+          }
           className={inputClass}
         >
           {CATEGORY_OPTIONS.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
       </div>
@@ -122,8 +145,8 @@ function LogItem({ log }: { log: MealLogForHistory }) {
             onClick={() => setForm((f) => ({ ...f, cookedBy: value }))}
             className={`rounded-lg border px-2 py-1.5 text-xs font-medium transition-all ${
               form.cookedBy === value
-                ? "bg-orange-100 border-orange-300 text-orange-700"
-                : "bg-white border-gray-200 text-gray-600"
+                ? "bg-coal border-ember text-ember"
+                : "bg-raised border-edge text-mist"
             }`}
           >
             {label}
@@ -146,21 +169,22 @@ function LogItem({ log }: { log: MealLogForHistory }) {
         className={`${inputClass} resize-none`}
       />
 
-      {form.error && (
-        <p className="text-xs text-red-500">{form.error}</p>
-      )}
+      {form.error && <p className="text-xs text-red-400">{form.error}</p>}
 
       <div className="flex gap-2">
         <button
           onClick={handleSave}
           disabled={form.saving || form.menuName.trim() === ""}
-          className="flex-1 rounded-lg bg-orange-500 py-1.5 text-xs font-medium text-white hover:bg-orange-600 disabled:opacity-50 transition-colors"
+          className="flex-1 rounded-lg bg-ember py-1.5 text-xs font-semibold text-white hover:bg-flame disabled:opacity-40 transition-colors"
         >
           {form.saving ? "保存中..." : "保存"}
         </button>
         <button
-          onClick={() => setEditing(false)}
-          className="flex-1 rounded-lg border border-gray-200 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50 transition-colors"
+          onClick={() => {
+            setEditing(false);
+            setForm(logToForm(log));
+          }}
+          className="flex-1 rounded-lg border border-edge py-1.5 text-xs font-medium text-mist hover:bg-haze transition-colors"
         >
           キャンセル
         </button>
@@ -172,17 +196,16 @@ function LogItem({ log }: { log: MealLogForHistory }) {
 type Props = {
   date: string;
   logs: MealLogForHistory[];
+  onDateChange: (date: string) => void;
 };
 
-export default function DayDetail({ date, logs }: Props) {
+export default function DayDetail({ date, logs, onDateChange }: Props) {
   return (
-    <div className="bg-white rounded-2xl border border-orange-100 p-4 space-y-3">
-      <h3 className="text-sm font-semibold text-gray-700">
-        {formatDisplayDate(date)}
-      </h3>
+    <div className="bg-surface rounded-2xl border border-edge p-4 space-y-3">
+      <h3 className="text-sm font-semibold text-parchment">{formatDisplayDate(date)}</h3>
       <ul className="space-y-3">
         {logs.map((log) => (
-          <LogItem key={log.id} log={log} />
+          <LogItem key={log.id} log={log} onDateChange={onDateChange} />
         ))}
       </ul>
     </div>

@@ -4,21 +4,15 @@ import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { inputClass, primaryButtonClass } from "@/lib/styles";
-import { COOKED_BY_LABELS } from "@/lib/types/home";
 import type { CookedBy, MenuCategory } from "@/lib/supabase/types";
 import MessageCard from "@/components/proposal/MessageCard";
+import { CATEGORY_OPTIONS, COOKED_BY_OPTIONS } from "@/lib/constants";
+import { localDateString } from "@/lib/date";
 
 type Message = {
   tone: "polite" | "casual" | "emoji";
   text: string;
 };
-
-const CATEGORY_OPTIONS: MenuCategory[] = ["和食", "洋食", "中華", "麺", "丼", "その他"];
-const COOKED_BY_OPTIONS = Object.entries(COOKED_BY_LABELS) as [CookedBy, string][];
-
-function todayString(): string {
-  return new Date().toISOString().split("T")[0];
-}
 
 export default function RecordPage() {
   const router = useRouter();
@@ -29,7 +23,6 @@ export default function RecordPage() {
   const proposedMenuName = params.get("menuName") ?? "";
   const proposedMenuCategory = (params.get("menuCategory") ?? "その他") as MenuCategory;
 
-  // sessionStorage から返答文章を取得（proposal ページで保存済み）
   const messages = useMemo<Message[]>(() => {
     if (!sessionId) return [];
     try {
@@ -45,7 +38,7 @@ export default function RecordPage() {
   const [isUsingProposed, setIsUsingProposed] = useState(false);
   const [cookedBy, setCookedBy] = useState<CookedBy | null>(null);
   const [memo, setMemo] = useState("");
-  const [eatenAt, setEatenAt] = useState(todayString());
+  const [eatenAt, setEatenAt] = useState(localDateString());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,29 +92,30 @@ export default function RecordPage() {
 
   return (
     <div className="space-y-4">
-      <Link href="/proposal" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+      <Link
+        href="/proposal"
+        className="inline-flex items-center gap-1 text-sm text-cinder hover:text-mist transition-colors"
+      >
         ← 提案に戻る
       </Link>
 
-      {/* 提案したメニュー（表示のみ） */}
       {proposedMenuName && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-2">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+        <div className="bg-surface rounded-2xl border border-edge p-5 space-y-2">
+          <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
             提案したメニュー
           </h2>
           <div className="flex items-center gap-2">
-            <span className="text-base font-semibold text-gray-800">{proposedMenuName}</span>
-            <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700">
+            <span className="text-base font-semibold text-parchment">{proposedMenuName}</span>
+            <span className="rounded-full bg-gold/15 px-2 py-0.5 text-xs text-gold">
               {proposedMenuCategory}
             </span>
           </div>
         </div>
       )}
 
-      {/* 返答文章 */}
       {messages.length > 0 && (
         <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
             返答文章
           </h2>
           {messages.map((msg, i) => (
@@ -130,20 +124,18 @@ export default function RecordPage() {
         </div>
       )}
 
-      {/* 実際に食べたメニュー */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+      <div className="bg-surface rounded-2xl border border-edge p-5 space-y-3">
+        <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
           実際に食べたメニュー
         </h2>
 
-        {/* 提案と同じ クイック選択 */}
         {proposedMenuName && (
           <button
             onClick={handleUseProposed}
             className={`w-full rounded-xl border px-3 py-2.5 text-sm font-medium text-left transition-all ${
               isUsingProposed
-                ? "bg-orange-50 border-orange-300 text-orange-700 ring-2 ring-orange-300"
-                : "bg-white border-gray-200 text-gray-600 hover:border-orange-200"
+                ? "bg-coal border-ember text-ember ring-1 ring-ember/40"
+                : "bg-raised border-edge text-mist hover:border-rim"
             }`}
           >
             {isUsingProposed ? "✓ " : ""}提案と同じ（{proposedMenuName}）
@@ -166,14 +158,15 @@ export default function RecordPage() {
           className={inputClass}
         >
           {CATEGORY_OPTIONS.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
           ))}
         </select>
       </div>
 
-      {/* 誰が作った？ */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+      <div className="bg-surface rounded-2xl border border-edge p-5 space-y-3">
+        <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
           誰が作った？
         </h2>
         <div className="grid grid-cols-2 gap-2">
@@ -183,8 +176,8 @@ export default function RecordPage() {
               onClick={() => setCookedBy(value)}
               className={`rounded-xl border px-3 py-2.5 text-sm font-medium transition-all ${
                 cookedBy === value
-                  ? "bg-orange-50 border-orange-300 text-orange-700 ring-2 ring-orange-300"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-orange-200"
+                  ? "bg-coal border-ember text-ember ring-1 ring-ember/40"
+                  : "bg-raised border-edge text-mist hover:border-rim"
               }`}
             >
               {label}
@@ -193,9 +186,8 @@ export default function RecordPage() {
         </div>
       </div>
 
-      {/* いつ食べた？ */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+      <div className="bg-surface rounded-2xl border border-edge p-5 space-y-3">
+        <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
           いつ食べた？
         </h2>
         <input
@@ -206,9 +198,8 @@ export default function RecordPage() {
         />
       </div>
 
-      {/* メモ */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+      <div className="bg-surface rounded-2xl border border-edge p-5 space-y-3">
+        <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
           メモ（任意）
         </h2>
         <textarea
@@ -220,9 +211,7 @@ export default function RecordPage() {
         />
       </div>
 
-      {error && (
-        <p className="text-sm text-red-500 text-center">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-400 text-center">{error}</p>}
 
       <button
         onClick={handleSubmit}

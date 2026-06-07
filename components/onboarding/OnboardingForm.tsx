@@ -90,18 +90,18 @@ export default function OnboardingForm({ userId }: { userId: string }) {
 
   return (
     <div className="space-y-5">
-      {/* ステップインジケーター */}
       <div className="flex items-center justify-center gap-2">
         {[1, 2].map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors
-                ${step >= s ? "bg-orange-500 text-white" : "bg-gray-200 text-gray-400"}`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                step >= s ? "bg-ember text-white" : "bg-raised text-cinder"
+              }`}
             >
               {s}
             </div>
             {s < 2 && (
-              <div className={`w-16 h-0.5 ${step > s ? "bg-orange-400" : "bg-gray-200"}`} />
+              <div className={`w-16 h-0.5 ${step > s ? "bg-ember" : "bg-edge"}`} />
             )}
           </div>
         ))}
@@ -110,15 +110,15 @@ export default function OnboardingForm({ userId }: { userId: string }) {
       {step === 1 && (
         <div className="space-y-5">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">
+            <h2 className="text-lg font-semibold text-parchment mb-1">
               パートナーについて教えてください
             </h2>
-            <p className="text-sm text-gray-500">より良いメニュー提案のために使います</p>
+            <p className="text-sm text-mist">より良いメニュー提案のために使います</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              パートナーの名前 <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-mist mb-1">
+              パートナーの名前 <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -131,7 +131,7 @@ export default function OnboardingForm({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-mist mb-1">
               好きな食べ物・料理
             </label>
             <input
@@ -144,7 +144,7 @@ export default function OnboardingForm({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-mist mb-1">
               苦手な食べ物・料理
             </label>
             <input
@@ -157,7 +157,7 @@ export default function OnboardingForm({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-mist mb-1">
               料理の傾向
             </label>
             <input
@@ -173,9 +173,7 @@ export default function OnboardingForm({ userId }: { userId: string }) {
             type="button"
             disabled={!step1.partnerName.trim()}
             onClick={() => setStep(2)}
-            className="w-full rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-medium text-white
-                       hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400
-                       disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full rounded-xl bg-ember px-4 py-2.5 text-sm font-semibold text-white hover:bg-flame focus:outline-none focus:ring-2 focus:ring-ember/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
             次へ
           </button>
@@ -185,12 +183,12 @@ export default function OnboardingForm({ userId }: { userId: string }) {
       {step === 2 && (
         <div className="space-y-5">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-1">あなたの設定</h2>
-            <p className="text-sm text-gray-500">後から設定で変更できます</p>
+            <h2 className="text-lg font-semibold text-parchment mb-1">あなたの設定</h2>
+            <p className="text-sm text-mist">後から設定で変更できます</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-mist mb-1">
               あなたの名前（任意）
             </label>
             <input
@@ -203,17 +201,18 @@ export default function OnboardingForm({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-mist mb-2">
               返答のトーン
             </label>
             <div className="space-y-2">
               {TONE_OPTIONS.map((opt) => (
                 <label
                   key={opt.value}
-                  className={`flex items-center gap-3 rounded-lg border-2 px-4 py-3 cursor-pointer transition-colors
-                    ${step2.tonePreference === opt.value
-                      ? "border-orange-400 bg-orange-50"
-                      : "border-gray-200 hover:border-gray-300"}`}
+                  className={`flex items-center gap-3 rounded-xl border-2 px-4 py-3 cursor-pointer transition-colors ${
+                    step2.tonePreference === opt.value
+                      ? "border-ember bg-coal"
+                      : "border-edge hover:border-rim"
+                  }`}
                 >
                   <input
                     type="radio"
@@ -221,11 +220,11 @@ export default function OnboardingForm({ userId }: { userId: string }) {
                     value={opt.value}
                     checked={step2.tonePreference === opt.value}
                     onChange={() => updateStep2("tonePreference", opt.value)}
-                    className="text-orange-500"
+                    className="accent-[#e07228]"
                   />
                   <div>
-                    <div className="text-sm font-medium text-gray-800">{opt.label}</div>
-                    <div className="text-xs text-gray-500">{opt.description}</div>
+                    <div className="text-sm font-medium text-parchment">{opt.label}</div>
+                    <div className="text-xs text-mist">{opt.description}</div>
                   </div>
                 </label>
               ))}
@@ -233,9 +232,9 @@ export default function OnboardingForm({ userId }: { userId: string }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-mist mb-1">
               重複除外日数
-              <span className="ml-1 text-xs text-gray-400">（直近何日間のメニューを除外するか）</span>
+              <span className="ml-1 text-xs text-cinder">（直近何日間のメニューを除外するか）</span>
             </label>
             <div className="flex items-center gap-3">
               <input
@@ -244,24 +243,25 @@ export default function OnboardingForm({ userId }: { userId: string }) {
                 max={30}
                 value={step2.excludeDays}
                 onChange={(e) => updateStep2("excludeDays", Number(e.target.value))}
-                className="flex-1 accent-orange-500"
+                className="flex-1"
               />
-              <span className="w-12 text-center text-sm font-medium text-gray-700">
+              <span className="w-12 text-center text-sm font-medium text-parchment">
                 {step2.excludeDays}日
               </span>
             </div>
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+            <p className="text-sm text-red-400 bg-red-950/40 rounded-lg px-3 py-2 border border-red-900/50">
+              {error}
+            </p>
           )}
 
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700
-                         hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+              className="flex-1 rounded-xl border border-edge px-4 py-2.5 text-sm font-medium text-mist hover:bg-raised transition-colors"
             >
               戻る
             </button>
@@ -269,9 +269,7 @@ export default function OnboardingForm({ userId }: { userId: string }) {
               type="button"
               disabled={isLoading}
               onClick={handleComplete}
-              className="flex-1 rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-medium text-white
-                         hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400
-                         disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 rounded-xl bg-ember px-4 py-2.5 text-sm font-semibold text-white hover:bg-flame focus:outline-none focus:ring-2 focus:ring-ember/30 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? "保存中..." : "はじめる"}
             </button>

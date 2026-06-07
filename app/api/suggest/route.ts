@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateSuggestion } from "@/lib/claude/suggest";
+import { localDateString } from "@/lib/date";
 
 export async function POST() {
   const supabase = await createClient();
@@ -93,7 +94,7 @@ export async function POST() {
   }
 
   // 提案セッション作成
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateString();
   const { data: session } = await supabase
     .from("suggestion_sessions")
     .insert({
@@ -118,7 +119,12 @@ export async function POST() {
     order_index: index,
   }));
 
-  await supabase.from("suggestion_items").insert(itemInserts);
+  const { error: itemsError } = await supabase.from("suggestion_items").insert(itemInserts);
+  if (itemsError) {
+    console.error("suggestion_items 保存エラー:", itemsError);
+    await supabase.from("suggestion_sessions").delete().eq("id", session.id);
+    return NextResponse.json({ error: "提案の保存に失敗しました" }, { status: 500 });
+  }
 
   return NextResponse.json({
     sessionId: session.id,

@@ -17,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .single();
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-night">
       <AppHeader displayName={userRow?.display_name ?? null} />
       <main className="max-w-lg mx-auto px-4 py-6">{children}</main>
     </div>

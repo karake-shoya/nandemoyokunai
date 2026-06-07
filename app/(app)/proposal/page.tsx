@@ -53,7 +53,6 @@ export default function ProposalPage() {
       const result = json as SuggestResult;
       setState({ status: "done", data: result });
 
-      // 返答文章を record ページで参照できるよう sessionStorage に保存
       sessionStorage.setItem(
         `messages-${result.sessionId}`,
         JSON.stringify(result.messages)
@@ -73,8 +72,8 @@ export default function ProposalPage() {
   if (state.status === "loading") {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <div className="h-10 w-10 rounded-full border-4 border-orange-200 border-t-orange-500 animate-spin" />
-        <p className="text-sm text-gray-500">AIが考えています...</p>
+        <div className="h-10 w-10 rounded-full border-2 border-edge border-t-ember animate-spin" />
+        <p className="text-sm text-mist">AIが考えています...</p>
       </div>
     );
   }
@@ -82,11 +81,11 @@ export default function ProposalPage() {
   if (state.status === "error") {
     return (
       <div className="flex flex-col items-center justify-center py-24 gap-4">
-        <p className="text-3xl">😢</p>
-        <p className="text-sm text-gray-600 text-center">{state.message}</p>
+        <p className="text-3xl opacity-50">😢</p>
+        <p className="text-sm text-mist text-center">{state.message}</p>
         <button
           onClick={fetchSuggestion}
-          className="mt-2 rounded-lg bg-orange-500 px-5 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors"
+          className="mt-2 rounded-xl bg-ember px-5 py-2.5 text-sm font-semibold text-white hover:bg-flame transition-colors"
         >
           もう一度試す
         </button>
@@ -102,18 +101,21 @@ export default function ProposalPage() {
 
   return (
     <div className="space-y-6">
-      <Link href="/home" className="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 transition-colors">
+      <Link
+        href="/home"
+        className="inline-flex items-center gap-1 text-sm text-cinder hover:text-mist transition-colors"
+      >
         ← ホームに戻る
       </Link>
 
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          <h2 className="text-xs font-medium text-mist uppercase tracking-widest">
             メニュー候補
           </h2>
           <button
             onClick={fetchSuggestion}
-            className="text-xs text-orange-500 hover:text-orange-700 transition-colors flex items-center gap-1"
+            className="text-xs text-ember hover:text-flame transition-colors flex items-center gap-1"
           >
             <span>↺</span> 入れ替え
           </button>

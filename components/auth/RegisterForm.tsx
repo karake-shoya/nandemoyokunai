@@ -46,8 +46,8 @@ export default function RegisterForm() {
     return (
       <div className="text-center space-y-3">
         <div className="text-4xl">📧</div>
-        <h3 className="font-semibold text-gray-800">確認メールを送信しました</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="font-semibold text-parchment">確認メールを送信しました</h3>
+        <p className="text-sm text-mist">
           {email} に確認メールを送りました。
           <br />
           メール内のリンクをクリックして登録を完了してください。
@@ -59,7 +59,7 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-mist mb-1">
           メールアドレス
         </label>
         <input
@@ -74,9 +74,9 @@ export default function RegisterForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-mist mb-1">
           パスワード
-          <span className="ml-1 text-xs text-gray-400">（8文字以上）</span>
+          <span className="ml-1 text-xs text-cinder">（8文字以上）</span>
         </label>
         <input
           id="password"
@@ -91,20 +91,18 @@ export default function RegisterForm() {
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        <p className="text-sm text-red-400 bg-red-950/40 rounded-lg px-3 py-2 border border-red-900/50">
+          {error}
+        </p>
       )}
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className={primaryButtonClass}
-      >
+      <button type="submit" disabled={isLoading} className={primaryButtonClass}>
         {isLoading ? "登録中..." : "アカウントを作成"}
       </button>
 
-      <p className="text-center text-sm text-gray-500">
+      <p className="text-center text-sm text-cinder">
         すでにアカウントをお持ちの方は{" "}
-        <Link href="/login" className="text-orange-600 hover:underline font-medium">
+        <Link href="/login" className="text-ember hover:text-flame font-medium">
           ログイン
         </Link>
       </p>

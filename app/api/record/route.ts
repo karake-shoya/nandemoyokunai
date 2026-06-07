@@ -75,11 +75,15 @@ export async function POST(req: NextRequest) {
 
   // selected_menu_id = 提案画面で選んだメニュー（実際に食べたものではない）
   if (sessionId && proposedMenuId && proposedMenuId !== "") {
-    await supabase
+    const { error: sessionUpdateError } = await supabase
       .from("suggestion_sessions")
       .update({ selected_menu_id: proposedMenuId })
       .eq("id", sessionId)
       .eq("user_id", user.id);
+    if (sessionUpdateError) {
+      // 食事記録は保存済みのため致命的ではないがログに残す
+      console.error("selected_menu_id 更新エラー:", sessionUpdateError);
+    }
   }
 
   return NextResponse.json({ success: true });
@@ -131,7 +135,7 @@ export async function PATCH(req: NextRequest) {
     resolvedMenuId = inserted.id;
   }
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("meal_logs")
     .update({
       menu_id: resolvedMenuId,
@@ -140,11 +144,16 @@ export async function PATCH(req: NextRequest) {
       eaten_at: eatenAt,
     })
     .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .select("id");
 
   if (error) {
     console.error("meal_log 更新エラー:", error);
     return NextResponse.json({ error: "更新に失敗しました" }, { status: 500 });
+  }
+
+  if (!updated || updated.length === 0) {
+    return NextResponse.json({ error: "記録が見つかりませんでした" }, { status: 404 });
   }
 
   return NextResponse.json({ success: true });

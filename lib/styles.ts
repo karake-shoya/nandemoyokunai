@@ -1,9 +1,10 @@
-// フォームUI共通クラス定数
 export const inputClass =
-  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 " +
-  "focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent";
+  "w-full rounded-lg border border-edge bg-raised px-3 py-2 text-sm text-parchment " +
+  "placeholder:text-cinder " +
+  "focus:outline-none focus:ring-2 focus:ring-ember/30 focus:border-ember " +
+  "transition-colors";
 
 export const primaryButtonClass =
-  "w-full rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-medium text-white " +
-  "hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 " +
-  "disabled:opacity-50 disabled:cursor-not-allowed transition-colors";
+  "w-full rounded-xl bg-ember px-4 py-2.5 text-sm font-semibold text-white " +
+  "hover:bg-flame focus:outline-none focus:ring-2 focus:ring-ember/30 " +
+  "disabled:opacity-40 disabled:cursor-not-allowed transition-colors";

@@ -10,6 +10,12 @@ const TONE_LABELS: Record<ToneLabel, string> = {
   emoji: "絵文字入り",
 };
 
+const TONE_COLORS: Record<ToneLabel, string> = {
+  polite: "text-gold bg-gold/10",
+  casual: "text-flame bg-flame/10",
+  emoji: "text-ember bg-ember/10",
+};
+
 type Props = {
   message: { tone: ToneLabel; text: string };
 };
@@ -24,19 +30,23 @@ export default function MessageCard({ message }: Props) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+    <div className="bg-surface rounded-xl border border-edge p-4">
+      <div className="flex items-center justify-between mb-3">
+        <span
+          className={`rounded-full px-2 py-0.5 text-xs font-medium ${TONE_COLORS[message.tone]}`}
+        >
           {TONE_LABELS[message.tone]}
         </span>
         <button
           onClick={handleCopy}
-          className="text-xs text-orange-500 hover:text-orange-700 transition-colors"
+          className={`text-xs transition-colors ${
+            copied ? "text-ember" : "text-cinder hover:text-mist"
+          }`}
         >
           {copied ? "コピー済み ✓" : "コピー"}
         </button>
       </div>
-      <p className="text-sm text-gray-700 leading-relaxed">{message.text}</p>
+      <p className="text-sm text-parchment leading-relaxed">{message.text}</p>
     </div>
   );
 }

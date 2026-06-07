@@ -1,26 +1,69 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-night: #160d06;
+  --color-surface: #221508;
+  --color-raised: #2e1d0d;
+  --color-haze: #3a2210;
+  --color-edge: #4e3218;
+  --color-rim: #684422;
+  --color-ember: #e07228;
+  --color-flame: #f0894c;
+  --color-coal: #3d1e08;
+  --color-gold: #c89040;
+  --color-parchment: #ede3d0;
+  --color-mist: #b09070;
+  --color-cinder: #6b4f35;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.28;
+  }
+}
+
+@layer utilities {
+  .font-mincho {
+    font-family: "Hiragino Mincho ProN", "ヒラギノ明朝 ProN W3", "游明朝", YuMincho,
+      Georgia, serif;
+  }
+  .animate-fade-up {
+    animation: fade-up 0.35s ease-out both;
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 4s ease-in-out infinite;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #160d06;
+  color: #ede3d0;
+  font-family: "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ ProN W3", "Yu Gothic",
+    "游ゴシック", Meiryo, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+input,
+select,
+textarea {
+  color-scheme: dark;
+}
+
+input[type="range"] {
+  accent-color: #e07228;
 }

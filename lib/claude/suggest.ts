@@ -22,7 +22,8 @@ const SuggestOutputSchema = z.object({
         reason: z.string(),
       })
     )
-    .length(4),
+    .min(3)
+    .max(5),
   messages: z
     .array(
       z.object({

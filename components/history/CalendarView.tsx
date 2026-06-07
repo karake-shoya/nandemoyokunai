@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { MealLogForHistory } from "@/lib/types/home";
 import DayDetail from "./DayDetail";
+import { monthKey } from "@/lib/date";
 
 const WEEKDAYS = ["日", "月", "火", "水", "木", "金", "土"];
 
@@ -21,12 +23,15 @@ function getCalendarDays(year: number, month: number): (number | null)[] {
 
 type Props = {
   logs: MealLogForHistory[];
+  initialYear: number;
+  initialMonth: number;
 };
 
-export default function CalendarView({ logs }: Props) {
+export default function CalendarView({ logs, initialYear, initialMonth }: Props) {
+  const router = useRouter();
   const today = new Date();
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
+  const currentYear = initialYear;
+  const currentMonth = initialMonth;
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const logsByDate = useMemo(() => {
@@ -40,22 +45,16 @@ export default function CalendarView({ logs }: Props) {
   const todayKey = toDateKey(today.getFullYear(), today.getMonth(), today.getDate());
 
   function prevMonth() {
-    if (currentMonth === 0) {
-      setCurrentYear((y) => y - 1);
-      setCurrentMonth(11);
-    } else {
-      setCurrentMonth((m) => m - 1);
-    }
+    const newYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const newMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    router.push(`/history?month=${monthKey(newYear, newMonth)}`);
     setSelectedDate(null);
   }
 
   function nextMonth() {
-    if (currentMonth === 11) {
-      setCurrentYear((y) => y + 1);
-      setCurrentMonth(0);
-    } else {
-      setCurrentMonth((m) => m + 1);
-    }
+    const newYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+    const newMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+    router.push(`/history?month=${monthKey(newYear, newMonth)}`);
     setSelectedDate(null);
   }
 
@@ -67,33 +66,31 @@ export default function CalendarView({ logs }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* 月ナビゲーション */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-4">
+      <div className="bg-surface rounded-2xl border border-edge p-4">
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={prevMonth}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-haze text-mist transition-colors"
           >
             ‹
           </button>
-          <span className="text-sm font-semibold text-gray-700">
+          <span className="text-sm font-semibold text-parchment">
             {currentYear}年{currentMonth + 1}月
           </span>
           <button
             onClick={nextMonth}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-haze text-mist transition-colors"
           >
             ›
           </button>
         </div>
 
-        {/* 曜日ヘッダー */}
         <div className="grid grid-cols-7 mb-1">
           {WEEKDAYS.map((wd, i) => (
             <div
               key={wd}
               className={`text-center text-xs font-medium py-1 ${
-                i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-gray-400"
+                i === 0 ? "text-red-400" : i === 6 ? "text-blue-400" : "text-cinder"
               }`}
             >
               {wd}
@@ -101,7 +98,6 @@ export default function CalendarView({ logs }: Props) {
           ))}
         </div>
 
-        {/* 日付グリッド */}
         <div className="grid grid-cols-7 gap-y-1">
           {calendarDays.map((day, i) => {
             if (day === null) {
@@ -122,17 +118,21 @@ export default function CalendarView({ logs }: Props) {
                 className={`
                   relative flex flex-col items-center justify-center
                   h-10 w-full rounded-lg text-sm transition-all
-                  ${isSelected ? "bg-orange-100 ring-2 ring-orange-400 font-semibold text-orange-700" : ""}
-                  ${!isSelected && isToday ? "border border-gray-300 font-semibold text-gray-700" : ""}
-                  ${!isSelected && !isToday && hasLog ? "text-gray-800 hover:bg-orange-50 cursor-pointer" : ""}
-                  ${!hasLog ? "text-gray-300 cursor-default" : ""}
+                  ${isSelected ? "bg-coal ring-1 ring-ember font-semibold text-ember" : ""}
+                  ${!isSelected && isToday ? "border border-rim font-semibold text-parchment" : ""}
+                  ${!isSelected && !isToday && hasLog ? "text-parchment hover:bg-haze cursor-pointer" : ""}
+                  ${!hasLog ? "text-cinder cursor-default" : ""}
                   ${colIndex === 0 && !isSelected && !isToday ? "text-red-400" : ""}
                   ${colIndex === 6 && !isSelected && !isToday ? "text-blue-400" : ""}
                 `}
               >
                 <span>{day}</span>
                 {hasLog && (
-                  <span className={`text-[8px] leading-none mt-0.5 ${isSelected ? "text-orange-500" : "text-orange-400"}`}>
+                  <span
+                    className={`text-[8px] leading-none mt-0.5 ${
+                      isSelected ? "text-ember" : "text-ember/60"
+                    }`}
+                  >
                     ●
                   </span>
                 )}
@@ -142,9 +142,12 @@ export default function CalendarView({ logs }: Props) {
         </div>
       </div>
 
-      {/* 選択日の詳細 */}
       {selectedDate && logsByDate[selectedDate] && (
-        <DayDetail date={selectedDate} logs={logsByDate[selectedDate]} />
+        <DayDetail
+          date={selectedDate}
+          logs={logsByDate[selectedDate]}
+          onDateChange={setSelectedDate}
+        />
       )}
     </div>
   );

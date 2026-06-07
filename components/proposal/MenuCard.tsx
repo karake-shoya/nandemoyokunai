@@ -10,19 +10,19 @@ export default function MenuCard({ menu, isSelected, onSelect }: Props) {
       onClick={onSelect}
       className={`w-full text-left rounded-xl border p-4 transition-all ${
         isSelected
-          ? "bg-orange-50 border-orange-300 ring-2 ring-orange-300"
-          : "bg-white border-gray-100 hover:border-orange-200"
+          ? "bg-coal border-ember ring-1 ring-ember/40"
+          : "bg-surface border-edge hover:border-rim hover:bg-raised"
       }`}
     >
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-sm font-semibold text-gray-800">{menu.name}</span>
-        <span className="shrink-0 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700">
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <span className="text-sm font-semibold text-parchment leading-snug">
+          {menu.name}
+        </span>
+        <span className="shrink-0 rounded-full bg-gold/15 px-2 py-0.5 text-xs text-gold">
           {menu.category}
         </span>
       </div>
-      <p className="mt-1.5 text-xs text-gray-500 leading-relaxed">
-        {menu.reason}
-      </p>
+      <p className="text-xs text-mist leading-relaxed">{menu.reason}</p>
     </button>
   );
 }

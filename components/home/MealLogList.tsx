@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { MealLogWithMenu } from "@/lib/types/home";
 import { COOKED_BY_LABELS } from "@/lib/types/home";
 
@@ -9,9 +10,14 @@ function formatDate(dateStr: string): string {
 export default function MealLogList({ logs }: { logs: MealLogWithMenu[] }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-        最近の食事
-      </h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          最近の食事
+        </h3>
+        <Link href="/history" className="text-xs text-orange-500 hover:text-orange-700 transition-colors">
+          すべて見る →
+        </Link>
+      </div>
 
       {logs.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">

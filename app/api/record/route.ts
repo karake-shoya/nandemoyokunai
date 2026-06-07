@@ -84,3 +84,68 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ success: true });
 }
+
+type PatchBody = {
+  id: string;
+  menuName: string;
+  menuCategory: string;
+  cookedBy: string;
+  memo?: string;
+  eatenAt: string;
+};
+
+export async function PATCH(req: NextRequest) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "未認証です" }, { status: 401 });
+  }
+
+  const body: PatchBody = await req.json();
+  const { id, menuName, menuCategory, cookedBy, memo, eatenAt } = body;
+
+  // メニューIDを解決（SELECT-first）
+  const { data: existing } = await supabase
+    .from("menus")
+    .select("id")
+    .eq("name", menuName)
+    .maybeSingle();
+
+  let resolvedMenuId: string;
+  if (existing) {
+    resolvedMenuId = existing.id;
+  } else {
+    const { data: inserted } = await supabase
+      .from("menus")
+      .insert({ name: menuName, category: menuCategory as never, is_shared: false, created_by: user.id })
+      .select("id")
+      .single();
+
+    if (!inserted) {
+      return NextResponse.json({ error: "メニューの保存に失敗しました" }, { status: 500 });
+    }
+    resolvedMenuId = inserted.id;
+  }
+
+  const { error } = await supabase
+    .from("meal_logs")
+    .update({
+      menu_id: resolvedMenuId,
+      cooked_by: cookedBy as never,
+      memo: memo ?? null,
+      eaten_at: eatenAt,
+    })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("meal_log 更新エラー:", error);
+    return NextResponse.json({ error: "更新に失敗しました" }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
